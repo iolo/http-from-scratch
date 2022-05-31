@@ -1,5 +1,6 @@
 const { Socket } = require('net');
 const { parseUrl } = require('./url');
+const { parseResponse } = require('./response');
 
 const client = new Socket();
 
@@ -7,6 +8,8 @@ client.setEncoding('UTF-8');
 
 client.on('data', (data) => {
   console.log('client:data:', data);
+  const response = parseResponse(data);
+  console.log(response);
 });
 
 client.on('end', () => {
