@@ -1,6 +1,6 @@
 const { parseRequest } = require('./request');
 
-describe('url', () => {
+describe('request', () => {
   describe('parseRequest', () => {
     it('should parse', () => {
       const TEST_DATA = 'GET / HTTP/1.1\r\nHost: HOST\r\nContent-Type: application/json\r\n\r\nBODY';
