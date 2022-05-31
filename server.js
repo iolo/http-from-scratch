@@ -12,6 +12,8 @@ server.on('connection', (socket) => {
   socket.on('data', (data) => {
     console.log('server:socket:data', data);
 
+    socket.write('HTTP/1.0 200 OK\r\n');
+    socket.write('\r\n');
     socket.write('Hello,World!\r\n');
     socket.end();
   });
