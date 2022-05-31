@@ -1,4 +1,7 @@
 const { Server } = require('net');
+const fs = require('fs');
+const path = require('path');
+const { parseUrl } = require('./url');
 
 const server = new Server();
 
@@ -22,17 +25,20 @@ server.on('connection', (socket) => {
       return result;
     }, {});
 
-    socket.write('HTTP/1.0 200 OK\r\n');
-    socket.write('Server: server/0.0.1\r\n');
-    socket.write('Content-Type: text/plain\r\n');
-    socket.write('\r\n');
-    socket.write('Hello,World!\r\n');
-    socket.write(`method: ${method}\r\n`);
-    socket.write(`requestUri: ${requestUri}\r\n`);
-    socket.write(`httpVersion: ${httpVersion}\r\n`);
-    socket.write('headers:\r\n');
-    for (const [name, value] of Object.entries(headers)) {
-      socket.write(`* ${name}:${value}\r\n`);
+    const url = parseUrl(requestUri);
+    const file = path.join('public_html', url.path);
+    if (fs.existsSync(file)) {
+      socket.write('HTTP/1.0 200 OK\r\n');
+      socket.write('Server: server/0.0.1\r\n');
+      socket.write('Content-Type: text/plain\r\n');
+      socket.write('\r\n');
+      socket.write(fs.readFileSync(file, 'utf8'));
+    } else {
+      socket.write('HTTP/1.0 404 NOT FOUND\r\n');
+      socket.write('Server: server/0.0.1\r\n');
+      socket.write('Content-Type: text/plain\r\n');
+      socket.write('\r\n');
+      socket.write('404 NOT FOUND!\r\n');
     }
     socket.end();
   });
