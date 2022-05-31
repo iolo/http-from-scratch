@@ -30,5 +30,8 @@ client.connect(port, hostname, () => {
   console.log(`* remote: ${client.remoteAddress}:${client.remotePort}`);
 
   client.write(`GET ${pathname}${search} HTTP/1.0\r\n`);
+  client.write(`Host: ${host}\r\n`);
+  client.write(`Accept: */*\r\n`);
+  client.write(`User-Agent: client/0.0.1\r\n`);
   client.write('\r\n');
 });
