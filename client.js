@@ -29,6 +29,6 @@ client.connect(port, hostname, () => {
   console.log(`* local: ${client.localAddress}:${client.localPort}`);
   console.log(`* remote: ${client.remoteAddress}:${client.remotePort}`);
 
-  client.write(`GET ${pathname}${search}\r\n`);
+  client.write(`GET ${pathname}${search} HTTP/1.0\r\n`);
   client.write('\r\n');
 });
