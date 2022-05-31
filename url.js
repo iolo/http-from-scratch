@@ -1,6 +1,5 @@
 const URL_REGEX = /^((https?:)?\/\/(([^:]+):([^@]+)@)?(([a-zA-Z_\-\.]+)(:([0-9]+))?))?([^\?#]*)?(\?[^#]*)?(#.*)?$/;
 //                  12             34       5         67               8 9            a         b         c
-console.log(URL_REGEX.exec('https://user:pass@example.com:123/p/a/t/h?a=b&c=d#e=f&g=h'));
 //[
 // 0:'https://user:pass@example.com:123/p/a/t/h?a=b&c=d#e=f&g=h',
 // 1:'https://user:pass@example.com:123',
