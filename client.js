@@ -22,14 +22,14 @@ client.on('error', (err) => {
 });
 
 const url = process.argv[2] || 'http://localhost:8080';
-const { host, hostname, port = 80, pathname = '/', search = '' } = parseUrl(url);
+const { host, hostname, port = 80, path = '/', search = '' } = parseUrl(url);
 
 client.connect(port, hostname, () => {
   console.log('client:connect!');
   console.log(`* local: ${client.localAddress}:${client.localPort}`);
   console.log(`* remote: ${client.remoteAddress}:${client.remotePort}`);
 
-  client.write(`GET ${pathname}${search} HTTP/1.0\r\n`);
+  client.write(`GET ${path}${search} HTTP/1.0\r\n`);
   client.write(`Host: ${host}\r\n`);
   client.write(`Accept: */*\r\n`);
   client.write(`User-Agent: client/0.0.1\r\n`);
