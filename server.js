@@ -1,7 +1,7 @@
 const { Server } = require('net');
 const fs = require('fs');
 const path = require('path');
-const { parseUrl } = require('./url');
+const { parseUrl, parseQueryString } = require('./url');
 
 const server = new Server();
 
@@ -24,6 +24,23 @@ server.on('connection', (socket) => {
       result[name.trim().toLowerCase()] = value.trim();
       return result;
     }, {});
+
+    if (method === 'POST') {
+      const requestContentType = headers['content-type'];
+      if (requestContentType === 'application/x-www-form-urlencoded') {
+        const params = parseQueryString(bodyPart);
+        console.log(params);
+        socket.write('HTTP/1.0 200 OK\r\n');
+        socket.write('Server: 0.0.1\r\n');
+        socket.write('Content-Type: text/plain\r\n');
+        socket.write('\r\n');
+        for (const [key, value] of Object.entries(params)) {
+          socket.write(`${key} = ${value}\r\n`);
+        }
+      }
+      socket.end();
+      return;
+    }
 
     const url = parseUrl(requestUri);
     const file = path.join('public_html', url.path);
