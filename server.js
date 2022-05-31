@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { parseUrl, parseQueryString } = require('./url');
 const { getMimeType } = require('./mime');
+const { parseRequest } = require('./request');
 
 const server = new Server();
 
@@ -16,20 +17,12 @@ server.on('connection', (socket) => {
   socket.on('data', (data) => {
     console.log('server:socket:data', data);
 
-    const [headPart, bodyPart] = data.split('\r\n\r\n', 2);
-
-    const [requestLine, ...headerLines] = headPart.split('\r\n');
-    const [method, requestUri, httpVersion] = requestLine.split(' ', 3);
-    const headers = headerLines.reduce((result, headerLine) => {
-      const [name, value] = headerLine.split(':', 2);
-      result[name.trim().toLowerCase()] = value.trim();
-      return result;
-    }, {});
+    const { method, requestUri, httpVersion, headers, body } = parseRequest(data);
 
     if (method === 'POST') {
       const requestContentType = headers['content-type'];
       if (requestContentType === 'application/x-www-form-urlencoded') {
-        const params = parseQueryString(bodyPart);
+        const params = parseQueryString(body);
         console.log(params);
         socket.write('HTTP/1.0 200 OK\r\n');
         socket.write('Server: 0.0.1\r\n');
