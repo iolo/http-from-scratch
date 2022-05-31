@@ -1,14 +1,17 @@
+const { parseHeaderLines } = require('./header');
+
+function parseRequestLine(requestLine) {
+  const [method, requestUri, httpVersion] = requestLine.split(' ', 3);
+  return { method: method.toUpperCase(), requestUri, httpVersion };
+}
+
 function parseRequest(data) {
   const [head, body] = data.split('\r\n\r\n', 2);
   const [requestLine, ...headerLines] = head.split('\r\n');
-  const [method, requestUri, httpVersion] = requestLine.split(' ', 3);
-  const headers = headerLines.reduce((result, headerLine) => {
-    const [name, value] = headerLine.split(':', 2);
-    result[name.trim().toLowerCase()] = value.trim();
-    return result;
-  }, {});
+  const { method, requestUri, httpVersion } = parseRequestLine(requestLine);
+  const headers = parseHeaderLines(headerLines);
   return {
-    method: method.toUpperCase(),
+    method,
     requestUri,
     httpVersion,
     headers,
