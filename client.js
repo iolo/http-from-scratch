@@ -1,4 +1,5 @@
 const { Socket } = require('net');
+const { parseUrl } = require('./url');
 
 const client = new Socket();
 
@@ -20,14 +21,14 @@ client.on('error', (err) => {
   console.error('client:error:' + err);
 });
 
-const host = '0.0.0.0';
-const port = 8080;
+const url = process.argv[2] || 'http://localhost:8080';
+const { host, hostname, port = 80, pathname = '/', search = '' } = parseUrl(url);
 
-client.connect({host, port}, 'localhost', () => {
+client.connect(port, hostname, () => {
   console.log('client:connect!');
   console.log(`* local: ${client.localAddress}:${client.localPort}`);
   console.log(`* remote: ${client.remoteAddress}:${client.remotePort}`);
 
-  client.write('GET /\r\n');
+  client.write(`GET ${pathname}${search}\r\n`);
   client.write('\r\n');
 });
