@@ -2,6 +2,7 @@ const { Server } = require('net');
 const fs = require('fs');
 const path = require('path');
 const { parseUrl, parseQueryString } = require('./url');
+const { getMimeType } = require('./mime');
 
 const server = new Server();
 
@@ -45,11 +46,12 @@ server.on('connection', (socket) => {
     const url = parseUrl(requestUri);
     const file = path.join('public_html', url.path);
     if (fs.existsSync(file)) {
+      const responseContentType = getMimeType(file);
       socket.write('HTTP/1.0 200 OK\r\n');
       socket.write('Server: server/0.0.1\r\n');
-      socket.write('Content-Type: text/plain\r\n');
+      socket.write(`Content-Type: ${responseContentType}\r\n`);
       socket.write('\r\n');
-      socket.write(fs.readFileSync(file, 'utf8'));
+      socket.write(fs.readFileSync(file));
     } else {
       socket.write('HTTP/1.0 404 NOT FOUND\r\n');
       socket.write('Server: server/0.0.1\r\n');
