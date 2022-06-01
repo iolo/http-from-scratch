@@ -19,13 +19,17 @@ server.on('connection', (socket) => {
 
     const { method, requestUri, httpVersion, headers, body } = parseRequest(data);
 
+    const isKeepAlive =
+      (httpVersion === 'HTTP/1.0' && headers.connection === 'keep-alive') ||
+      (httpVersion === 'HTTP/1.1' && headers.connection !== 'close');
+
     if (method === 'POST') {
       const requestContentType = headers['content-type'];
       if (requestContentType === 'application/x-www-form-urlencoded') {
         const params = parseQueryString(body);
         console.log(params);
         socket.write('HTTP/1.0 200 OK\r\n');
-        socket.write('Server: 0.0.1\r\n');
+        socket.write('Server: server/0.0.1\r\n');
         socket.write('Content-Type: text/plain\r\n');
         socket.write('\r\n');
         for (const [key, value] of Object.entries(params)) {
@@ -33,6 +37,33 @@ server.on('connection', (socket) => {
         }
       }
       socket.end();
+      return;
+    }
+
+    if (requestUri === '/old') {
+      socket.write('HTTP/1.1 302 FOUND\r\n');
+      socket.write('Connection: keep-alive\r\n');
+      socket.write('Server: server/0.0.1\r\n');
+      socket.write('Location: /new\r\n');
+      socket.write('Content-Length: 0\r\n');
+      socket.write('\r\n');
+      if (!isKeepAlive) {
+        socket.end();
+      }
+      return;
+    }
+
+    if (requestUri === '/new') {
+      socket.write('HTTP/1.1 200 OK\r\n');
+      socket.write('Connection: keep-alive\r\n');
+      socket.write('Server: server/0.0.1\r\n');
+      socket.write('Content-Type: text/plain\r\n');
+      socket.write('Content-Length: 3\r\n');
+      socket.write('\r\n');
+      socket.write('new');
+      if (!isKeepAlive) {
+        socket.end();
+      }
       return;
     }
 
@@ -46,7 +77,7 @@ server.on('connection', (socket) => {
       socket.write('\r\n');
       socket.write(fs.readFileSync(file));
     } else {
-      socket.write('HTTP/1.0 404 NOT FOUND\r\n');
+      socket.write('HTTP/1.1 404 NOT FOUND\r\n');
       socket.write('Server: server/0.0.1\r\n');
       socket.write('Content-Type: text/plain\r\n');
       socket.write('\r\n');
@@ -75,4 +106,3 @@ server.on('error', (err) => {
 server.listen(8080, () => {
   console.log('server:listen:', server.address());
 });
-
