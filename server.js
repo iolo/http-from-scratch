@@ -2,7 +2,7 @@ const { Server } = require('net');
 const fs = require('fs');
 const path = require('path');
 const { parseUrl, parseQueryString } = require('./url');
-const { getMimeType } = require('./mime');
+const { getMediaType } = require('./media');
 const { parseRequest } = require('./request');
 
 const server = new Server();
